@@ -1,16 +1,18 @@
-{% extends 'layout/base.html' %}
+{% extends 'admin/base.html' %}
 
-{% block title %}Đăng nhập{% endblock %}
-
-{% block content %}
+{% block body %}
 {% if err_msg %}
 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md shadow-md">
     <p>{{ err_msg }}</p>
 </div>
 {% endif %}
+
+{% if current_user.is_authenticated %}
+
+{% else %}
 <div class="flex justify-center items-center h-screen">
   <div class="bg-white p-8 rounded shadow-md w-80">
-      <h2 class="text-2xl font-semibold mb-4 text-center">Đăng nhập</h2>
+      <h2 class="text-2xl font-semibold mb-4 text-center">Đăng nhập quản trị</h2>
       <form method="post">
           <div class="mb-4">
               <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Tên đăng nhập</label>
@@ -24,12 +26,7 @@
               <button type="submit" value="Đăng nhập" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Đăng nhập</button>
           </div>
       </form>
-      <div class="mx-auto flex justify-center mt-2">
-        <div class="text-gray-900 dark:text-black text-center">
-            <span>Chưa có tài khoản? </span>
-            <a href="/register" class="text-blue-700 dark:text-blue-500 hover:underline">Đăng ký tại đây</a>
-        </div>
-      </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}

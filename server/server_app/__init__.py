@@ -10,7 +10,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app=app)
 
-# login = LoginManager(app=app)
+login = LoginManager(app=app)
 
 # cloudinary.config(
 #     cloud_name = 'djga3njzi',
