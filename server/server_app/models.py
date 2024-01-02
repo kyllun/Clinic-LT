@@ -27,10 +27,10 @@ class NguoiDung(BaseModel, UserMixin):
     email = Column(String(50))
     loaiNguoiDung = Column(Enum(Role))
 
-    benhNhan = relationship("BenhNhan", uselist=False, back_populates="nguoiDung")
-    yTa = relationship("YTa", uselist=False, back_populates="nguoiDung")
-    bacSi = relationship("BacSi", uselist=False, back_populates="nguoiDung")
-    thuNgan = relationship("ThuNgan", uselist=False, back_populates="nguoiDung")
+    # benhNhan = relationship("BenhNhan", uselist=False, back_populates="nguoiDung")
+    # yTa = relationship("YTa", uselist=False, back_populates="nguoiDung")
+    # bacSi = relationship("BacSi", uselist=False, back_populates="nguoiDung")
+    # thuNgan = relationship("ThuNgan", uselist=False, back_populates="nguoiDung")
 
     def __str__(self):
         return self.name
@@ -42,7 +42,7 @@ class BenhNhan(db.Model):
 
     phieuDangKy = relationship('PhieuDangKy', backref='benhNhan', lazy=True)
     phieuKham = relationship("PhieuKham", uselist=False, back_populates="benhNhan")
-    nguoiDung = relationship("NguoiDung", back_populates="benhNhan")
+    # nguoiDung = relationship("NguoiDung", back_populates="benhNhan")
     
     def __str__(self):
         return self.name
@@ -53,7 +53,7 @@ class YTa(db.Model):
     phuTrach = Column(String(50))
 
     phieuDangKy = relationship('PhieuDangKy', backref='yTa', lazy=True)
-    nguoiDung = relationship("NguoiDung", back_populates="yTa")
+    # nguoiDung = relationship("NguoiDung", back_populates="yTa")
 
     def __str__(self):
         return self.name
@@ -64,7 +64,7 @@ class BacSi(db.Model):
     chuyenMon = Column(String(100))
 
     phieuKham = relationship('PhieuKham', backref='bacSi', lazy=True)
-    nguoiDung = relationship("NguoiDung", back_populates="bacSi")
+    # nguoiDung = relationship("NguoiDung", back_populates="bacSi")
 
     def __str__(self):
         return self.name
@@ -75,7 +75,7 @@ class ThuNgan(db.Model):
     trinhDo = Column(String(50))
 
     hoaDon = relationship('HoaDon', backref='thuNgan', lazy=True)
-    nguoiDung = relationship("NguoiDung", back_populates="thuNgan")
+    # nguoiDung = relationship("NguoiDung", back_populates="thuNgan")
 
     def __str__(self):
         return self.name
@@ -156,4 +156,5 @@ class DonViThuoc(BaseModel):
 
 if __name__ == '__main__':
     with app.app_context():
+        db.drop_all()
         db.create_all()

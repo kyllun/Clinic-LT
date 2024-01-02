@@ -31,8 +31,9 @@ def user_login():
     if request.method.__eq__('POST'):
         username = request.form.get('username')
         password = request.form.get('password')
+        userRole = request.form.get('userRole')
 
-        user = dao.check_login(username=username, password=password)
+        user = dao.check_login(username=username, password=password, userRole=userRole)
 
         if user:
             login_user(user=user) #current_user
@@ -51,6 +52,10 @@ def user_signout():
 @login.user_loader
 def user_load(user_id):
     return dao.get_user_by_id(user_id=user_id)
+
+@app.route('/medical_register')
+def medical_register():
+    return render_template('medical_register_page.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

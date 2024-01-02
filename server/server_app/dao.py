@@ -12,12 +12,12 @@ def add_user(name, username, password):
     db.session.add(user)
     db.session.commit()
 
-def check_login(username, password):
-    if username and password: 
+def check_login(username, password, userRole):
+    if username and password and userRole: 
         password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())   
-        # Tìm kiếm người dùng dựa trên tên đăng nhập
+        # Tìm kiếm người dùng dựa trên tên đăng nhập va vai tro
         try:
-            user = NguoiDung.query.filter_by(username=username.strip()).one()
+            user = NguoiDung.query.filter_by(username=username.strip(), loaiNguoiDung=userRole).one()
         except NoResultFound:
             return None  # Trả về None nếu không tìm thấy người dùng
         
