@@ -1,6 +1,7 @@
 from flask import render_template, url_for, redirect, request
 from server_app import app, dao, login
 from flask_login import login_user, logout_user, login_required
+from server_app.models import Role
 
 @app.route("/")
 def home_page():
@@ -52,6 +53,10 @@ def user_signout():
 @login.user_loader
 def user_load(user_id):
     return dao.get_user_by_id(user_id=user_id)
+
+@app.context_processor
+def common_response():
+    return dict(Role=Role)
 
 @app.route('/medical_register')
 def medical_register():

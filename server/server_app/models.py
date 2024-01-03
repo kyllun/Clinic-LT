@@ -4,6 +4,7 @@ from server_app import db, app
 from datetime import datetime
 from flask_login import UserMixin
 from enum import Enum as UserEnum
+import hashlib
 
 class Role(UserEnum):
     Admin = 1
@@ -27,10 +28,11 @@ class NguoiDung(BaseModel, UserMixin):
     email = Column(String(50))
     loaiNguoiDung = Column(Enum(Role))
 
-    # benhNhan = relationship("BenhNhan", uselist=False, back_populates="nguoiDung")
-    # yTa = relationship("YTa", uselist=False, back_populates="nguoiDung")
-    # bacSi = relationship("BacSi", uselist=False, back_populates="nguoiDung")
-    # thuNgan = relationship("ThuNgan", uselist=False, back_populates="nguoiDung")
+    benhNhan = relationship("BenhNhan", uselist=False, back_populates="nguoiDung")
+    yTa = relationship("YTa", uselist=False, back_populates="nguoiDung")
+    bacSi = relationship("BacSi", uselist=False, back_populates="nguoiDung")
+    thuNgan = relationship("ThuNgan", uselist=False, back_populates="nguoiDung")
+    quanTriVien = relationship("QuanTriVien", uselist=False, back_populates="nguoiDung")
 
     def __str__(self):
         return self.name
@@ -42,7 +44,7 @@ class BenhNhan(db.Model):
 
     phieuDangKy = relationship('PhieuDangKy', backref='benhNhan', lazy=True)
     phieuKham = relationship("PhieuKham", uselist=False, back_populates="benhNhan")
-    # nguoiDung = relationship("NguoiDung", back_populates="benhNhan")
+    nguoiDung = relationship("NguoiDung", back_populates="benhNhan")
     
     def __str__(self):
         return self.name
@@ -53,7 +55,7 @@ class YTa(db.Model):
     phuTrach = Column(String(50))
 
     phieuDangKy = relationship('PhieuDangKy', backref='yTa', lazy=True)
-    # nguoiDung = relationship("NguoiDung", back_populates="yTa")
+    nguoiDung = relationship("NguoiDung", back_populates="yTa")
 
     def __str__(self):
         return self.name
@@ -64,7 +66,7 @@ class BacSi(db.Model):
     chuyenMon = Column(String(100))
 
     phieuKham = relationship('PhieuKham', backref='bacSi', lazy=True)
-    # nguoiDung = relationship("NguoiDung", back_populates="bacSi")
+    nguoiDung = relationship("NguoiDung", back_populates="bacSi")
 
     def __str__(self):
         return self.name
@@ -75,8 +77,19 @@ class ThuNgan(db.Model):
     trinhDo = Column(String(50))
 
     hoaDon = relationship('HoaDon', backref='thuNgan', lazy=True)
-    # nguoiDung = relationship("NguoiDung", back_populates="thuNgan")
+    nguoiDung = relationship("NguoiDung", back_populates="thuNgan")
 
+    def __str__(self):
+        return self.name
+
+class QuanTriVien(db.Model):
+    __tablename__ = 'quan_tri_vien'
+    id = Column(Integer, ForeignKey("nguoi_dung.id"), primary_key=True)
+    ghiChu = Column(String(100))
+
+    nguoiDung = relationship("NguoiDung", back_populates="quanTriVien")
+    quyDinh = relationship('QuyDinh', backref='quanTriVien', lazy=True)
+    
     def __str__(self):
         return self.name
     
@@ -153,8 +166,30 @@ class DonViThuoc(BaseModel):
 
     def __str__(self):
         return self.name
+    
+class QuyDinh(BaseModel):
+    __tablename__ = 'quy_dinh'
+    tenQuyDinh = Column(String(50), nullable=False)
+    moTa = Column(String(100))
+    quanTriVien_id = Column(Integer, ForeignKey('quan_tri_vien.id'), nullable=False)
 
 if __name__ == '__main__':
     with app.app_context():
         db.drop_all()
         db.create_all()
+
+        password = '111'
+        password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())   
+
+        NguoiDung1 = NguoiDung(hoTen='Y Ta 1', username='yta1', password=password, loaiNguoiDung=Role.Nurse)
+        NguoiDung2 = NguoiDung(hoTen='Bac Si 1', username='bacsi1', password=password, loaiNguoiDung=Role.Doctor)
+        NguoiDung3 = NguoiDung(hoTen='Thu Ngan 1', username='thungan1', password=password, loaiNguoiDung=Role.Cashier)
+        NguoiDung4 = NguoiDung(hoTen='Quan Tri Vien 1', username='quantrivien1', password=password, loaiNguoiDung=Role.Admin)
+        yTa1 = YTa(nguoiDung=NguoiDung1, phuTrach='Cham soc benh nhan')
+        bacSi1 = BacSi(nguoiDung=NguoiDung2, chuyenMon='Phau thuat')
+        thuNgan1 = ThuNgan(nguoiDung=NguoiDung3, trinhDo='Thac si')
+        quanTriVien1 = QuanTriVien(nguoiDung=NguoiDung4, ghiChu='Quan tri vien cap cao')
+
+        db.session.add_all([NguoiDung1, NguoiDung2, NguoiDung3, NguoiDung4])
+        db.session.add_all([yTa1, bacSi1, thuNgan1, quanTriVien1])
+        db.session.commit()
