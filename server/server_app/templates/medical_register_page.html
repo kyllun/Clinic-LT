@@ -5,19 +5,15 @@
 {% block content %}
 <div class="flex items-center justify-center mt-4 mb-4">
     <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <h1 class="text-3xl font-semibold mb-6 text-center">Đặt lịch khám</h1>
+        <h1 class="text-3xl font-semibold mb-6 text-center">Phiếu đăng ký lịch khám</h1>
         <form action="" method="post">
           <div class="mb-4">
             <label for="fullname" class="block text-gray-700 font-bold mb-2">Họ và tên</label>
-            <input type="text" id="fullname" name="fullname" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required>
-          </div>
-          <div class="mb-4">
-            <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
-            <input type="email" id="email" name="email" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required>
+            <input type="text" id="fullname" name="fullname" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required value="{{ current_user.hoTen }}">
           </div>
           <div class="mb-4">
             <label for="phone" class="block text-gray-700 font-bold mb-2">Số điện thoại</label>
-            <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required>
+            <input type="tel" id="phone" name="phone" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required value="{{ current_user.benhNhan.soDienThoai }}">
           </div>
           <div class="mb-4">
             <label for="date" class="block text-gray-700 font-bold mb-2">Ngày hẹn</label>

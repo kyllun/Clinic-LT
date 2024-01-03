@@ -62,5 +62,37 @@ def common_response():
 def medical_register():
     return render_template('medical_register_page.html')
 
+@app.route("/patient_information")
+def patient_information():    
+    return render_template("patient_infomation_page.html")
+
+@app.route("/patient_information/<int:user_id>", methods=['get', 'post'])
+def update_patient_infor(user_id):
+    if request.method.__eq__('POST'):
+        name = request.form.get('name')
+        sex = request.form.get('sex')
+        birth = request.form.get('birth')
+        email = request.form.get('email')
+        avatar = request.files.get('avatar')
+        address = request.form.get('address')
+        phone = request.form.get('phone')
+
+        dao.update_patient(user_id=user_id, name=name, sex=sex, birth=birth, email=email, avatar=avatar, address=address, phone=phone)
+        return redirect(url_for('home_page'))
+
+@app.route("/medical_register")
+def medical_register():    
+    return render_template("medical_register_page.html")
+
+@app.route("/medical_register/<int:user_id>", methods=['get', 'post'])
+def register_medical_form(user_id):
+    if request.method.__eq__('POST'):
+        date = request.form.get('date')
+        time = request.form.get('time')
+
+        dao.register_medical(date=date, time=time)
+        return redirect(url_for('home_page'))
+
+
 if __name__ == '__main__':
     app.run(debug=True)

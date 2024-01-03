@@ -20,7 +20,7 @@ class BaseModel(db.Model):
 class NguoiDung(BaseModel, UserMixin):
     __tablename__ = 'nguoi_dung'
     hoTen = Column(String(50), nullable=False)
-    gioiTinh = Column(Boolean)
+    gioiTinh = Column(String(10))
     namSinh = Column(DateTime)
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(50), nullable=False)
@@ -41,6 +41,7 @@ class BenhNhan(db.Model):
     __tablename__ = 'benh_nhan'
     id = Column(Integer, ForeignKey("nguoi_dung.id"), primary_key=True)
     diaChi = Column(String(100))
+    soDienThoai = Column(String(100), nullable=False)
 
     phieuDangKy = relationship('PhieuDangKy', backref='benhNhan', lazy=True)
     phieuKham = relationship("PhieuKham", uselist=False, back_populates="benhNhan")

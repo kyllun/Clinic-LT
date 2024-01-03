@@ -28,3 +28,26 @@ def check_login(username, password, userRole):
     
 def get_user_by_id(user_id):
     return NguoiDung.query.get(user_id)
+
+def update_patient(user_id, **kwargs):
+    user = NguoiDung.query.filter_by(id=user_id).first()
+
+    if user:
+        user.hoTen = kwargs.get('name')
+        user.gioiTinh = kwargs.get('sex')
+        user.namSinh = kwargs.get('birth')
+        user.email = kwargs.get('email')
+        user.avatar = kwargs.get('avatar')
+    
+    patient = BenhNhan(nguoiDung=user, diaChi=kwargs.get('address'), soDienThoai=kwargs.get('phone'))
+    db.session.add(patient)
+    db.session.commit()
+
+def register_medical(user_id, **kwargs):
+    user = NguoiDung.query.filter_by(id=user_id).first()
+    if user:
+        user.name = kwargs.get('name')
+        user.gioiTinh = kwargs.get('sex')
+        user.namSinh = kwargs.get('birth')
+        user.email = kwargs.get('email')
+        user.avatar = kwargs.get('avatar')
