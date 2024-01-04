@@ -2,6 +2,7 @@ from flask import render_template, url_for, redirect, request
 from server_app import app, dao, login
 from flask_login import login_user, logout_user, login_required
 from server_app.models import Role
+from datetime import datetime
 
 @app.route("/")
 def home_page():
@@ -58,10 +59,6 @@ def user_load(user_id):
 def common_response():
     return dict(Role=Role)
 
-@app.route('/medical_register')
-def medical_register():
-    return render_template('medical_register_page.html')
-
 @app.route("/patient_information")
 def patient_information():    
     return render_template("patient_infomation_page.html")
@@ -80,19 +77,29 @@ def update_patient_infor(user_id):
         dao.update_patient(user_id=user_id, name=name, sex=sex, birth=birth, email=email, avatar=avatar, address=address, phone=phone)
         return redirect(url_for('home_page'))
 
-@app.route("/medical_register")
-def medical_register():    
-    return render_template("medical_register_page.html")
+@app.route('/medical_register', methods=['get', 'post'])
+def medical_register():
+    if request.method.__eq__('POST'):
+        phone = request.form.get('phone')
+        date = request.form.get('date')
+        time = request.form.get('time')
+
+        date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
+
+        dao.register_medical(phone=phone, date_time=date_time)
+        return redirect(url_for('home_page'))
+    return render_template('medical_register_page.html')
 
 @app.route("/medical_register/<int:user_id>", methods=['get', 'post'])
-def register_medical_form(user_id):
+def patient_register_medical(user_id):
     if request.method.__eq__('POST'):
         date = request.form.get('date')
         time = request.form.get('time')
 
-        dao.register_medical(date=date, time=time)
-        return redirect(url_for('home_page'))
+        date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
 
+        dao.register_medical(user_id=user_id, date_time=date_time)
+        return redirect(url_for('home_page'))
 
 if __name__ == '__main__':
     app.run(debug=True)

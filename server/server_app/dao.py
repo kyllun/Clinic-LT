@@ -1,5 +1,5 @@
 from server_app import app, db
-from server_app.models import BenhNhan, YTa, BacSi, ThuNgan, NguoiDung, Role
+from server_app.models import BenhNhan, YTa, BacSi, ThuNgan, NguoiDung, Role, PhieuDangKy
 from sqlalchemy.orm.exc import NoResultFound
 import hashlib
 
@@ -43,11 +43,16 @@ def update_patient(user_id, **kwargs):
     db.session.add(patient)
     db.session.commit()
 
-def register_medical(user_id, **kwargs):
-    user = NguoiDung.query.filter_by(id=user_id).first()
-    if user:
-        user.name = kwargs.get('name')
-        user.gioiTinh = kwargs.get('sex')
-        user.namSinh = kwargs.get('birth')
-        user.email = kwargs.get('email')
-        user.avatar = kwargs.get('avatar')
+def register_medical(**kwargs):
+    user_id = kwargs.get('user_id')
+    phone = kwargs.get('phone')
+    if user_id:
+        benhNhan = BenhNhan.query.filter_by(id=user_id).first()
+    elif phone:
+        benhNhan = BenhNhan.query.filter_by(soDienThoai=phone).first()
+
+    if benhNhan:
+        phieuDK = PhieuDangKy(benhNhan_id=benhNhan.id, yTa_id=None, ngayKham=kwargs.get('date_time'))
+        
+        db.session.add(phieuDK)
+        db.session.commit()
