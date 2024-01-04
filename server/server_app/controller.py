@@ -1,8 +1,10 @@
 from flask import render_template, url_for, redirect, request
 from server_app import app, dao, login
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from server_app.models import Role
 from datetime import datetime
+import cloudinary
+import cloudinary.uploader
 
 @app.route("/")
 def home_page():
@@ -71,10 +73,14 @@ def update_patient_infor(user_id):
         birth = request.form.get('birth')
         email = request.form.get('email')
         avatar = request.files.get('avatar')
+        avatar_path = None
+        if avatar:
+                res = cloudinary.uploader.upload(avatar)
+                avatar_path = res['secure_url']
         address = request.form.get('address')
         phone = request.form.get('phone')
 
-        dao.update_patient(user_id=user_id, name=name, sex=sex, birth=birth, email=email, avatar=avatar, address=address, phone=phone)
+        dao.update_patient(user_id=user_id, name=name, sex=sex, birth=birth, email=email, avatar=avatar_path, address=address, phone=phone)
         return redirect(url_for('home_page'))
 
 @app.route('/medical_register', methods=['get', 'post'])
@@ -100,6 +106,11 @@ def patient_register_medical(user_id):
 
         dao.register_medical(user_id=user_id, date_time=date_time)
         return redirect(url_for('home_page'))
+    
+@app.route("/medical_list")
+def medical_list():
+    
+    return render_template('medical_examination_list_page.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

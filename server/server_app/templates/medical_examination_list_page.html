@@ -1,0 +1,61 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h1 class="text-3xl font-bold mb-4">Danh sách khám bệnh</h1>
+
+    <!-- Thanh filter -->
+    <div class="mb-4 flex items-center">
+        <label for="dateFilter" class="font-semibold mr-2">Lọc theo ngày:</label>
+        <input type="date" id="dateFilter" class="px-2 py-1 border rounded-md">
+    </div>
+
+    <!-- Danh sách khám bệnh -->
+    <table id="patientTable" class="w-full bg-white border rounded-lg overflow-hidden">
+        <thead class="bg-gray-100 border-b">
+            <tr>
+                <th class="px-6 py-3 text-left font-semibold">Số thứ tự</th>
+                <th class="px-6 py-3 text-left font-semibold">Tên bệnh nhân</th>
+                <th class="px-6 py-3 text-left font-semibold">Số điện thoại</th>
+                <th class="px-6 py-3 text-left font-semibold">Ngày giờ khám</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dữ liệu mẫu -->
+            <tr>
+                <td class="px-6 py-4">1</td>
+                <td class="px-6 py-4">Nguyễn Văn A</td>
+                <td class="px-6 py-4">0123456789</td>
+                <td class="px-6 py-4">2024-01-04 09:00</td>
+            </tr>
+            <tr>
+                <td class="px-6 py-4">2</td>
+                <td class="px-6 py-4">Trần Thị B</td>
+                <td class="px-6 py-4">0987654321</td>
+                <td class="px-6 py-4">2024-01-05 10:30</td>
+            </tr>
+            <!-- Thêm dữ liệu khám bệnh vào đây -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Script để xử lý filter theo ngày -->
+<script>
+    const dateFilterInput = document.getElementById('dateFilter');
+    const tableRows = document.querySelectorAll('#patientTable tbody tr');
+
+    dateFilterInput.addEventListener('change', function () {
+        const selectedDate = this.value;
+        tableRows.forEach(row => {
+            const dateCell = row.querySelector('td:nth-child(4)').textContent.split(' ')[0];
+            if (selectedDate === dateCell) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
