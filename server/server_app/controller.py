@@ -85,27 +85,36 @@ def update_patient_infor(user_id):
 
 @app.route('/medical_register', methods=['get', 'post'])
 def medical_register():
-    if request.method.__eq__('POST'):
-        phone = request.form.get('phone')
-        date = request.form.get('date')
-        time = request.form.get('time')
+    if not current_user.is_authenticated:
+        return redirect('/login')
+    elif current_user.loaiNguoiDung == Role.Patient: 
+        if request.method.__eq__('POST'):
+            date = request.form.get('date')
+            time = request.form.get('time')
 
-        date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
+            date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
 
-        dao.register_medical(phone=phone, date_time=date_time)
-        return redirect(url_for('home_page'))
-    return render_template('medical_register_page.html')
+            count = dao.count_register_medical(date)
+            if count < 40:
+                dao.register_medical(user_id=current_user.id, date_time=date_time)
+            else: 
+                msg = 'Đã đủ số lượng đăng ký'
+            return redirect(url_for('home_page'))
+    elif current_user.loaiNguoiDung == Role.Nurse: 
+        if request.method.__eq__('POST'):
+            phone = request.form.get('phone')
+            date = request.form.get('date')
+            time = request.form.get('time')
 
-@app.route("/medical_register/<int:user_id>", methods=['get', 'post'])
-def patient_register_medical(user_id):
-    if request.method.__eq__('POST'):
-        date = request.form.get('date')
-        time = request.form.get('time')
+            date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
 
-        date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
-
-        dao.register_medical(user_id=user_id, date_time=date_time)
-        return redirect(url_for('home_page'))
+            count = dao.count_register_medical(date)
+            if count < 40:
+                dao.register_medical(phone=phone, date_time=date_time)
+            else: 
+                msg = 'Đã đủ số lượng đăng ký'
+            return redirect(url_for('home_page'))
+    return render_template('medical_register_page.html', msg=msg)
     
 @app.route("/medical_list")
 def medical_list():

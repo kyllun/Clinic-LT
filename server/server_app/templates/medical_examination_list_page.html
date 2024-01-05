@@ -3,59 +3,45 @@
 {% block title %}Đăng nhập{% endblock %}
 
 {% block content %}
-<div class="container mx-auto">
+<div class="container mx-auto px-10 py-8">
     <h1 class="text-3xl font-bold mb-4">Danh sách khám bệnh</h1>
-
-    <!-- Thanh filter -->
-    <div class="mb-4 flex items-center">
-        <label for="dateFilter" class="font-semibold mr-2">Lọc theo ngày:</label>
-        <input type="date" id="dateFilter" class="px-2 py-1 border rounded-md">
+    <!-- Thanh tìm kiếm -->
+    <div class="mb-4">
+        <input type="text" placeholder="Tìm kiếm..." class="border border-gray-300 max-w-xl py-2 rounded-md w-full">
     </div>
+    <!-- Bảng danh sách khám bệnh -->
 
-    <!-- Danh sách khám bệnh -->
-    <table id="patientTable" class="w-full bg-white border rounded-lg overflow-hidden">
-        <thead class="bg-gray-100 border-b">
+<div class="relative overflow-x-auto shadow-lg border-gray-200 border rounded-lg">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
-                <th class="px-6 py-3 text-left font-semibold">Số thứ tự</th>
-                <th class="px-6 py-3 text-left font-semibold">Tên bệnh nhân</th>
-                <th class="px-6 py-3 text-left font-semibold">Số điện thoại</th>
-                <th class="px-6 py-3 text-left font-semibold">Ngày giờ khám</th>
+                <th scope="col" class="px-6 py-3">
+                    Họ tên bệnh nhân
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Số điện thoại
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Ngày giờ khám
+                </th>
             </tr>
         </thead>
         <tbody>
-            <!-- Dữ liệu mẫu -->
-            <tr>
-                <td class="px-6 py-4">1</td>
-                <td class="px-6 py-4">Nguyễn Văn A</td>
-                <td class="px-6 py-4">0123456789</td>
-                <td class="px-6 py-4">2024-01-04 09:00</td>
+            <tr class="bg-white border-b">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    Apple MacBook Pro 17"
+                </th>
+
+                <td class="px-6 py-4">
+                    Silver
+                </td>
+                <td class="px-6 py-4">
+                    Laptop
+                </td>
             </tr>
-            <tr>
-                <td class="px-6 py-4">2</td>
-                <td class="px-6 py-4">Trần Thị B</td>
-                <td class="px-6 py-4">0987654321</td>
-                <td class="px-6 py-4">2024-01-05 10:30</td>
-            </tr>
-            <!-- Thêm dữ liệu khám bệnh vào đây -->
         </tbody>
     </table>
 </div>
 
-<!-- Script để xử lý filter theo ngày -->
-<script>
-    const dateFilterInput = document.getElementById('dateFilter');
-    const tableRows = document.querySelectorAll('#patientTable tbody tr');
-
-    dateFilterInput.addEventListener('change', function () {
-        const selectedDate = this.value;
-        tableRows.forEach(row => {
-            const dateCell = row.querySelector('td:nth-child(4)').textContent.split(' ')[0];
-            if (selectedDate === dateCell) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
-</script>
+</div>
 {% endblock %}

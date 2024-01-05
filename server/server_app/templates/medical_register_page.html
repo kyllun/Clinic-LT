@@ -7,7 +7,7 @@
     <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <h1 class="text-3xl font-semibold mb-6 text-center">Phiếu đăng ký lịch khám</h1>
         {% if current_user.loaiNguoiDung == Role.Patient %}
-          <form action="{{ url_for('patient_register_medical', user_id=current_user.id) }}" method="post">
+          <form action="/register_medical" method="post">
             <div class="mb-4">
               <label for="name" class="block text-gray-700 font-bold mb-2">Họ và tên</label>
               <input type="text" id="name" name="name" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required value="{{ current_user.hoTen }}">

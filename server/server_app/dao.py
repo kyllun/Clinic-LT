@@ -56,3 +56,7 @@ def register_medical(**kwargs):
         
         db.session.add(phieuDK)
         db.session.commit()
+
+def count_register_medical(date):
+    
+    return  PhieuDangKy.query.filter_by(ngayKham=date).count()
