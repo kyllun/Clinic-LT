@@ -151,21 +151,55 @@ class QuyDinh(BaseModel):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.drop_all()
-        db.create_all()
+        # db.drop_all()
+        # db.create_all()
 
-        password = '111'
-        password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())   
+        # password = '111'
+        # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())   
 
-        NguoiDung1 = NguoiDung(hoTen='Y Ta 1', username='yta1', password=password, loaiNguoiDung=Role.Nurse)
-        NguoiDung2 = NguoiDung(hoTen='Bac Si 1', username='bacsi1', password=password, loaiNguoiDung=Role.Doctor)
-        NguoiDung3 = NguoiDung(hoTen='Thu Ngan 1', username='thungan1', password=password, loaiNguoiDung=Role.Cashier)
-        NguoiDung4 = NguoiDung(hoTen='Quan Tri Vien 1', username='quantrivien1', password=password, loaiNguoiDung=Role.Admin)
-        yTa1 = YTa(nguoiDung=NguoiDung1, phuTrach='Cham soc benh nhan')
-        bacSi1 = BacSi(nguoiDung=NguoiDung2, chuyenMon='Phau thuat')
-        thuNgan1 = ThuNgan(nguoiDung=NguoiDung3, trinhDo='Thac si')
-        quanTriVien1 = QuanTriVien(nguoiDung=NguoiDung4, ghiChu='Quan tri vien cap cao')
+        # NguoiDung1 = NguoiDung(hoTen='Y Ta 1', username='yta1', password=password, loaiNguoiDung=Role.Nurse)
+        # NguoiDung2 = NguoiDung(hoTen='Bac Si 1', username='bacsi1', password=password, loaiNguoiDung=Role.Doctor)
+        # NguoiDung3 = NguoiDung(hoTen='Thu Ngan 1', username='thungan1', password=password, loaiNguoiDung=Role.Cashier)
+        # NguoiDung4 = NguoiDung(hoTen='Quan Tri Vien 1', username='quantrivien1', password=password, loaiNguoiDung=Role.Admin)
+        # yTa1 = YTa(nguoiDung=NguoiDung1, phuTrach='Cham soc benh nhan')
+        # bacSi1 = BacSi(nguoiDung=NguoiDung2, chuyenMon='Phau thuat')
+        # thuNgan1 = ThuNgan(nguoiDung=NguoiDung3, trinhDo='Thac si')
+        # quanTriVien1 = QuanTriVien(nguoiDung=NguoiDung4, ghiChu='Quan tri vien cap cao')
 
-        db.session.add_all([NguoiDung1, NguoiDung2, NguoiDung3, NguoiDung4])
-        db.session.add_all([yTa1, bacSi1, thuNgan1, quanTriVien1])
+        new_thuoc = Thuoc(
+            tenThuoc='Thuoc A',
+            ngaySX=datetime.utcnow(),
+            hanSD=datetime.utcnow(),
+            donGia=10000.0,
+            donViThuoc_id=1
+        )
+        new_thuoc1 = Thuoc(
+            tenThuoc='Thuoc p',
+            ngaySX=datetime.utcnow(),
+            hanSD=datetime.utcnow(),
+            donGia=11000.0,
+            donViThuoc_id=2
+        )
+        new_thuoc2 = Thuoc(
+            tenThuoc='Thuoc o',
+            ngaySX=datetime.utcnow(),
+            hanSD=datetime.utcnow(),
+            donGia=12000.0,
+            donViThuoc_id=1
+        )
+        new_thuoc3 = Thuoc(
+            tenThuoc='Thuoc j',
+            ngaySX=datetime.utcnow(),
+            hanSD=datetime.utcnow(),
+            donGia=11000.0,
+            donViThuoc_id=3
+        )
+        new_thuoc4 = Thuoc(
+            tenThuoc='Thuoc b',
+            ngaySX=datetime.utcnow(),
+            hanSD=datetime.utcnow(),
+            donGia=11000.0,
+            donViThuoc_id=2
+        )
+        db.session.add_all([new_thuoc, new_thuoc1, new_thuoc2, new_thuoc3, new_thuoc4])
         db.session.commit()

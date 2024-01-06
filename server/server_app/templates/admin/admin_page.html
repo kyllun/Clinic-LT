@@ -1,32 +1,98 @@
-{% extends 'admin/base.html' %}
+{% extends '/admin/base.html' %}
 
 {% block body %}
-{% if err_msg %}
-<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md shadow-md">
-    <p>{{ err_msg }}</p>
-</div>
-{% endif %}
-
 {% if current_user.is_authenticated %}
+<h1> Welcome {{current_user.name}} to administration website</h1>
+<div >
+<div >
+    <table class="table">
+      <tr>
+          <th>Ma Hoa Don</th>
+          <th>Tien kham</th>
+          <th>Tien Thuoc</th>
+          <th>Tong Tien</th>
+          <th>Ngay Kham</th>
+          <th>ThuNgan</th>
+          <th>PhieuKham</th>
+      </tr>
+      {% for hd in stats %}
+      <tr>
+          <th>{{ hd[0] }}</th>
+          <th>{{ hd[1] }}</th>
+          <th>{{ hd[2] }}</th>
+          <th>{{ hd[3] }}</th>
+          <th>{{ hd[4] }}</th>
+          <th>{{ hd[5] }}</th>
+          <th>{{ hd[6] }}</th>
+      </tr>
 
-{% else %}
-<div class="flex justify-center items-center h-screen">
-  <div class="bg-white p-8 rounded shadow-md w-80">
-      <h2 class="text-2xl font-semibold mb-4 text-center">Đăng nhập quản trị</h2>
-      <form method="post">
-          <div class="mb-4">
-              <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Tên đăng nhập</label>
-              <input type="text" id="username" name="username" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required>
-          </div>
-          <div class="mb-4">
-              <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Mật khẩu</label>
-              <input type="password" id="password" name="password" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-blue-500" required>
-          </div>
-          <div class="flex justify-center">
-              <button type="submit" value="Đăng nhập" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Đăng nhập</button>
-          </div>
-      </form>
+    {% endfor %}
+    </table>
+</div>
+  <div>
+    <canvas id="mySaleReport"></canvas>
   </div>
 </div>
-{% endif %}
-{% endblock %}
+
+{% else %}
+
+<h1 class="text-center text-danger ">Đăng nhập người dùng quản trị</h1>
+{% if err_msg %}
+<div class="alert alert-danger">
+    <h4>{{err_msg}}</h4>
+</div>
+
+{% endif%}
+<form method="post" action="{{url_for('login_admin')}}">
+    <div class="form-group" >
+    <label for="usernameAd">UserName</label>
+    <input type="text" class="form-control" id="usernameAd" name="usernameAd" style="width: 50%"/>
+    </div>
+ <div class="form-group">
+    <label for="passwordAd">Password</label>
+    <input type="password" class="form-control" id="passwordAd" name="passwordAd" style="width: 50%"/>
+    </div>
+    <input type="submit" value="Dang nhap quan tri" class="btn btn-success">
+</form>
+<br>
+<br>
+
+{%endif%}
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let label =[]
+let data =[]
+{% for  s in sales_data %}
+    label.push('{{ s[0] }}')
+    data.push({{ s[1] }})
+{% endfor %}
+    window.onload=function (){
+        const  ctx=document.getElementById('mySaleReport').getContext('2d');
+            new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: label,
+              datasets: [{
+                label: 'Thong ke doanh thu',
+                data: data,
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+
+    }
+
+</script>
+
+{%endblock%}
+

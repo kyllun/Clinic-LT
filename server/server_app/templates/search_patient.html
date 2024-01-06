@@ -1,0 +1,42 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Tra Cuu lich su Benh Nhan{% endblock %}
+
+{% block content %}
+
+<div class="container" style="text-align: center" >
+    <h1 style="font-size: x-large" >Danh Muc Thuoc</h1>
+<hr>
+    <form >
+        <input type="text" name="keywordthuoc" placeholder="Nhap tu khoa muon tim">
+        <input type="submit" value="Tim" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+    </form>
+    <table border="2"  class="products" style="margin: auto" >
+        <tr>
+            <th>Ma Thuốc</th>
+            <th>Ten thuốc</th>
+            <th>Ngày sản xuất</th>
+            <th>Ngày su dung</th>
+            <th>Gia Ban</th>
+        </tr>
+        {% for t in thuocs %}
+        <tr >
+            <td>{{t.id}}</td>
+             <td>{{t.tenThuoc}}</td>
+             <td>{{t.ngaySX}}</td>
+             <td>{{t.hanSD}}</td>
+             <td>{{"{:.1f}".format(t.donGia)}} VND</td>
+        </tr>
+        {% endfor %}
+
+
+    </table>
+
+<br>
+    <br>
+    <br>
+    <br><br>
+    </div>
+
+
+{% endblock %}

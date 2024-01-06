@@ -4,9 +4,9 @@
 
 {% block content %}
 {% if err_msg %}
-<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md shadow-md">
-    <p>{{ err_msg }}</p>
-</div>
+<div class="p-4 mb-4 text-sm text-red-800 bg-red-50" role="alert">
+    <span class="font-medium">{{ err_msg }}</span>
+  </div>
 {% endif %}
 <div class="flex justify-center items-center h-screen">
     <div class="bg-white p-8 rounded shadow-md w-80">
@@ -38,6 +38,9 @@
               <span>Chưa có tài khoản? </span>
               <a href="/register" class="text-blue-700 dark:text-blue-500 hover:underline">Đăng ký tại đây</a>
           </div>
+        </div>
+        <div class="mt-2 dark:text-black text-center">
+            <a href="/login_admin" class="text-blue-700 dark:text-blue-500 hover:underline">Đăng nhập bằng quản trị viên</a>
         </div>
     </div>
   </div>

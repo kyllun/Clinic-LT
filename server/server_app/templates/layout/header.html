@@ -12,21 +12,27 @@
             </li>
             {% if current_user.loaiNguoiDung == Role.Patient %}
             <li>
-              <a href="/medical_register" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Đặt lịch khám</a>
+              <a href="/register_medical" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Đặt lịch khám</a>
             </li>
             <li>
               <a href="/patient_information" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Hồ sơ cá nhân</a>
             </li>
             {% elif current_user.loaiNguoiDung == Role.Nurse %}
             <li>
-              <a href="/medical_register" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Đặt lịch khám</a>
+              <a href="/register_medical" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Đặt lịch khám</a>
             </li>
             <li>
-              <a href="medical_list" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Lập danh sách khám</a>
+              <a href="/medical_list" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Lập danh sách khám</a>
+            </li>
+            <li>
+              <a href="/medicine" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Tra cứu thuốc</a>
             </li>
             {% elif current_user.loaiNguoiDung == Role.Doctor %}
             <li>
               <a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Lập phiếu khám</a>
+            </li>
+            <li>
+              <a href="/medicine" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Tra cứu thuốc</a>
             </li>
             {% elif current_user.loaiNguoiDung == Role.Cashier %}
             <li>

@@ -1,7 +1,8 @@
 from server_app import app, db
-from server_app.models import BenhNhan, YTa, BacSi, ThuNgan, NguoiDung, Role, PhieuDangKy
+from server_app.models import BenhNhan, YTa, BacSi, ThuNgan, NguoiDung, Role, PhieuDangKy, Thuoc
 from sqlalchemy.orm.exc import NoResultFound
 import hashlib
+from sqlalchemy import func
 
 def add_user(name, username, password):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
@@ -39,24 +40,60 @@ def update_patient(user_id, **kwargs):
         user.email = kwargs.get('email')
         user.avatar = kwargs.get('avatar')
     
-    patient = BenhNhan(nguoiDung=user, diaChi=kwargs.get('address'), soDienThoai=kwargs.get('phone'))
+    patient = BenhNhan(nguoiDung=user, 
+                       diaChi=kwargs.get('address'), 
+                       soDienThoai=kwargs.get('phone'))
     db.session.add(patient)
     db.session.commit()
 
 def register_medical(**kwargs):
-    user_id = kwargs.get('user_id')
+    patient_id = kwargs.get('patient_id')
     phone = kwargs.get('phone')
-    if user_id:
-        benhNhan = BenhNhan.query.filter_by(id=user_id).first()
+    nurse_id = kwargs.get('nurse_id')
+
+    if patient_id:
+        phieuDK = PhieuDangKy(benhNhan_id=patient_id,
+                              yTa_id = 1,
+                              ngayKham=kwargs.get('date_time'))
     elif phone:
         benhNhan = BenhNhan.query.filter_by(soDienThoai=phone).first()
-
-    if benhNhan:
-        phieuDK = PhieuDangKy(benhNhan_id=benhNhan.id, yTa_id=None, ngayKham=kwargs.get('date_time'))
+        phieuDK = PhieuDangKy(benhNhan_id=benhNhan.id,
+                              yTa_id=nurse_id,
+                              ngayKham=kwargs.get('date_time'))
         
         db.session.add(phieuDK)
         db.session.commit()
 
 def count_register_medical(date):
     
-    return  PhieuDangKy.query.filter_by(ngayKham=date).count()
+    return PhieuDangKy.query.filter(func.date(PhieuDangKy.ngayKham).__eq__(date)).count()
+
+def get_register_medical_by_date(**kwargs):
+    query = db.session.query(
+        NguoiDung.hoTen,
+        BenhNhan.soDienThoai,
+        PhieuDangKy.ngayKham,
+        BenhNhan.id
+    ).join(BenhNhan, PhieuDangKy.benhNhan_id.__eq__(BenhNhan.id))\
+    .join(NguoiDung, BenhNhan.id.__eq__(NguoiDung.id))
+
+    date = kwargs.get('date')
+    if date:
+        query = query.filter(func.date(PhieuDangKy.ngayKham).__eq__(date))
+
+    return query.all()
+
+def count_medicine():
+    return Thuoc.query.filter(Thuoc.id.isnot(None)).count()
+
+def load_medicine(kw=None,page=1):
+    drugs = Thuoc.query.filter(Thuoc.id.isnot(None))
+
+    if kw:
+        drugs = drugs.filter(Thuoc.tenThuoc.contains(kw))
+
+    page_size =app.config['PAGE_SIZE']
+    start = (page-1)*page_size
+    end =start + page_size
+
+    return drugs.slice(start,end).all()
