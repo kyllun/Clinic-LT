@@ -4,12 +4,12 @@
 
 {% block content %}
 <div class="container mx-auto px-10 py-8">
-    <h1 class="text-3xl font-bold mb-4">Danh mục thuốc</h1>
+    <h1 class="text-center text-3xl font-bold mb-4">Danh mục thuốc</h1>
     {% if pages > 1%}
     <nav aria-label="Page navigation example">
         <ul class="inline-flex -space-x-px text-base h-10 mt-2">
             {% for idx in range(1, pages + 1) %}
-            <li><a href="{{ url_for('medicine_list',page=idx) }}" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700">{{idx}}</a></li>
+            <li><a href="{{ url_for('drugs_list',page=idx) }}" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700">{{idx}}</a></li>
             {% endfor %}
         </ul>
     </nav>
@@ -59,13 +59,6 @@
                             <td class="px-6 py-4">
                                 {{"{:,.0f}".format(t.donGia)}} VND
                             </td>
-                            {% if current_user.loaiNguoiDung == Role.Doctor %}
-                            <td class="px-6 py-4">
-                                <button type="button" class="mt-4 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" onclick="addToMedicine({{ t.id }},'{{t.tenThuoc}}',{{ t.donGia }})">
-                                    Thêm
-                                </button>
-                            </td>
-                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>

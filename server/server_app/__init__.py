@@ -18,3 +18,16 @@ cloudinary.config(
     api_key = '595946198281489',
     api_secret = 'hd1cRj177f0HVAQ-vSeqG_yT9Y0'
 )
+
+# Download the helper library from https://www.twilio.com/docs/python/install
+import os
+from twilio.rest import Client
+
+# Set environment variables for your credentials
+# Read more at http://twil.io/secure
+account_sid = "AC645668ca4d9314c4f1a9d9b14476f75a"
+auth_token = "797175bd8d82df462db857d1e741f302"
+verify_sid = "VA27569bc38b3bd9bc6f1da165e44bb848"
+# verified_number = "+84866135147"
+
+client = Client(account_sid, auth_token)

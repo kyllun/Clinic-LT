@@ -7,17 +7,28 @@ from flask import redirect
 from flask_admin import Admin, expose ,AdminIndexView
 from server_app import utils
 
-class AuthenticateModelView(ModelView):
+class MyAdmin(AdminIndexView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/admin_page.html', 
+                           stats=utils.sales_report(),
+                           sales_data=utils.total_amount_by_month())
+
+class AuthenticatedAdmin(ModelView):
      def is_accessible(self):
          return current_user.is_authenticated and current_user.loaiNguoiDung.__eq__(Role.Admin)
 
-class ThuocView(AuthenticateModelView):
+class DrugsView(AuthenticatedAdmin):
     column_list = ['tenThuoc', 'ngaySX', 'hanSD', 'donGia', 'donViThuoc']
+    column_searchable_list = ['tenThuoc', 'donGia']
+    column_filters = ['tenThuoc', 'donGia']
+    can_view_details = True
+    can_export = True
 
-class DonViThuocView(AuthenticateModelView):
+class DonViThuocView(AuthenticatedAdmin):
     column_list = ['donVi', 'thuoc']
 
-class MedicineView(ThuocView):
+class MedicineView(DrugsView):
     can_view_details = True
     can_export = True
     column_searchable_list = ['tenThuoc', 'donGia']
@@ -37,16 +48,8 @@ class LogoutView(BaseView):
 
     def is_accessible(self):
         return current_user.is_authenticated
-    
-class MyAdmin(AdminIndexView):
-    @expose('/')
-    def index(self):
-        return self.render('admin/admin_page.html', 
-                           stats=utils.sales_report(),
-                           sales_data=utils.total_amount_by_month())
-
 
 admin = Admin(app=app, name='Quản trị thuốc', template_mode='bootstrap4', index_view=MyAdmin())
-admin.add_view(AuthenticateModelView(DonViThuoc,db.session))
-admin.add_view(MedicineView(Thuoc,db.session))
+admin.add_view(DonViThuocView(DonViThuoc,db.session))
+admin.add_view(DrugsView(Thuoc,db.session))
 admin.add_view(LogoutView(name='Logout'))

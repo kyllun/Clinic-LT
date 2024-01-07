@@ -1,5 +1,5 @@
-from flask import render_template, url_for, redirect, request, session, jsonify
-from server_app import app, dao, login, utils, admin
+from flask import render_template, url_for, redirect, request, session, jsonify, send_file
+from server_app import app, dao, login, utils, admin, client, verify_sid
 from flask_login import login_user, logout_user, login_required, current_user
 from server_app.models import Role
 from datetime import datetime
@@ -150,11 +150,37 @@ def medical_list():
     date = request.args.get('date')
     medical_list = dao.get_register_medical_by_date(date=date)
 
+    # verification = client.verify.v2.services(verify_sid) \
+    # .verifications \
+    # .create(to=verified_number, channel="sms")
+    # print(verification.status)
+
+    # otp_code = input("Please enter the OTP:")
+
+    # verification_check = client.verify.v2.services(verify_sid) \
+    # .verification_checks \
+    # .create(to=verified_number, code=otp_code)
+    # print(verification_check.status)
+
     return render_template('medical_examination_list_page.html', 
                            medical_list=medical_list)
 
+@app.route('/generate_pdf', methods=['GET'])
+def generate_pdf():
+    date = request.args.get('date')
+    medical_list = dao.get_register_medical_by_date(date=date)
+    pdf = dao.create_medical_list_pdf(medical_list)
+    pdf.seek(0)  # Đảm bảo con trỏ ở đầu tệp
+
+    return send_file(
+        pdf,
+        attachment_filename='medical_list.pdf',
+        as_attachment=True,
+        mimetype='application/pdf'  # Thiết lập mimetype cho header
+    )
+
 @app.route("/medicine")
-def medicine_list():
+def drugs_list():
     kw = request.args.get("keywordthuoc")
     counter = dao.count_medicine()
     page = request.args.get("page", 1)
@@ -165,51 +191,104 @@ def medicine_list():
 
 @app.route('/login_admin',methods=['post', 'get'])
 def login_admin():
-    if request.method == 'POST':
+    if request.method.__eq__('POST'):
         username = request.form.get('usernameAd')
         password = request.form.get('passwordAd')
 
-        user = dao.check_login(username=username, password=password,userRole=Role.Admin)
+        user = dao.check_login(username=username, 
+                               password=password,
+                               userRole=Role.Admin)
 
         if user:
             login_user(user=user)
 
     return redirect('/admin')
 
-@app.route('/prescription')
-def prescription_medicine():
-    return render_template("prescription.html",
-                           stats=utils.counter_medicine(session.get('medicine')))
+#===========================================================
+@app.route('/examination_form', methods=['get', 'post'])
+def create_examination_form():
+    if request.method.__eq__('POST'):
+        name = request.form.get('name')
+        date = request.form.get('date')
+        symptom = request.form.get('symptom')
+        disease = request.form.get('disease')
+        medicineName = request.form.get('medicineName')
+        quantity = request.form.get('quantity')
+        unit = request.form.get('unit')
+        instruction = request.form.get('instruction')
+
+        dao.add_examination_form(name=name,
+                                 date=date,
+                                 symptom=symptom,
+                                 disease=disease,
+                                 medicineName=medicineName,
+                                 quantity=quantity,
+                                 unit=unit,
+                                 instruction=instruction,
+                                 id=current_user.id)
+
+    return render_template('examination_form.html')
+
+@app.route("/patient_search")
+def patient_list():
+    kw = request.args.get("keywordPatient")
+    counter = dao.count_patient()
+    page = request.args.get("page", 1)
+    patients = dao.load_patient(kw=kw, page=int(page))
+    return render_template('search_patient.html',
+                           patients=patients,
+                           pages=math.ceil(counter / app.config['PAGE_SIZE']))
+
+#==================================================================================
+
+@app.route('/api/save_exam_data', methods=['POST'])
+def save_exam_data():
+    data = request.json 
+    session['exam_data'] = data  
+    return jsonify({'message': 'Exam data saved successfully'})
+
+@app.route('/api/get_exam_data', methods=['GET'])
+def get_exam_data():
+    exam_data = session.get('exam_data', {})
+    print(exam_data)
+    return jsonify(exam_data)
+
+@app.route('receipt')
+def show_receipt():
+    
+    dao.show_receipt()
+
+    return render_template('receipt.html')
 
 
-# @app.context_processor
-# def common_responses():
-#     return {
-#         'medicine_state': utils.counter_medicine(session.get('medicine'))
-#     }
+@app.route('/api/pay', methods=['post'])
+@login_required
+def pay():
 
-@app.route("/api/add-medicine",methods=['post'])
-def add_to_medicine(): #add_prescription
-    data= request.get_json()
-    id=str(data.get('id'))
-    tenThuoc=data.get('tenThuoc')
-    donGia=data.get('donGia')
-    medicine =session.get('medicine')
-    if not medicine:
-        medicine={}
+   
 
-    if id in medicine:
-        medicine[id]['quantity']= medicine[id]['quantity']+1
-    else:
-        medicine[id]={
-             'id':id,
-            'tenThuoc':tenThuoc,
-            'donGia':donGia,
-            'quantity': 1
-        }
-    session['medicine']= medicine
+# @app.route("/api/add-medicine",methods=['post'])
+# def add_to_medicine(): #add_prescription
+#     data= request.get_json()
+#     id=str(data.get('id'))
+#     tenThuoc=data.get('tenThuoc')
+#     donGia=data.get('donGia')
+#     medicine =session.get('medicine')
+#     if not medicine:
+#         medicine={}
 
-    return jsonify(utils.counter_medicine(medicine))
+#     if id in medicine:
+#         medicine[id]['quantity']= medicine[id]['quantity']+1
+#     else:
+#         medicine[id]={
+#              'id':id,
+#             'tenThuoc':tenThuoc,
+#             'donGia':donGia,
+#             'quantity': 1
+#         }
+#     session['medicine']= medicine
+
+#     return jsonify(utils.counter_medicine(medicine))
 
 if __name__ == '__main__':
     app.run(debug=True)

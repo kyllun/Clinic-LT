@@ -1,8 +1,10 @@
 from server_app import app, db
-from server_app.models import BenhNhan, YTa, BacSi, ThuNgan, NguoiDung, Role, PhieuDangKy, Thuoc
+from server_app.models import *
 from sqlalchemy.orm.exc import NoResultFound
 import hashlib
 from sqlalchemy import func
+from io import BytesIO
+from reportlab.pdfgen import canvas
 
 def add_user(name, username, password):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
@@ -83,6 +85,22 @@ def get_register_medical_by_date(**kwargs):
 
     return query.all()
 
+def create_medical_list_pdf(data):
+    pdf_buffer = BytesIO()
+    pdf = canvas.Canvas(pdf_buffer)
+
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(100, 800, "Danh sách khám bệnh")
+    y_coordinate = 750
+
+    for record in data:
+        pdf.drawString(100, y_coordinate, f"Họ tên: {record[0]}, Ngày giờ khám: {record[2]}, Số điện thoại: {record[1]}")
+        y_coordinate -= 20  # Giả sử mỗi dòng là 20 điểm
+
+    pdf.save()
+    pdf_buffer.seek(0)
+    return pdf_buffer
+
 def count_medicine():
     return Thuoc.query.filter(Thuoc.id.isnot(None)).count()
 
@@ -97,3 +115,69 @@ def load_medicine(kw=None,page=1):
     end =start + page_size
 
     return drugs.slice(start,end).all()
+
+def count_patient():
+    return BenhNhan.query.filter(BenhNhan.id.isnot(None)).count()
+
+def load_patient(kw=None,page=1):
+    query = db.session.query(
+        NguoiDung.hoTen,
+        PhieuKham.ngayKham,
+        PhieuKham.trieuChung,
+        PhieuKham.duDoan
+    ).join(NguoiDung, NguoiDung.id == PhieuKham.benhNhan_id)\
+    .filter(NguoiDung.loaiNguoiDung == Role.Patient)
+
+    if kw:
+        query = query.filter(NguoiDung.hoTen.contains(kw))
+
+    page_size =app.config['PAGE_SIZE']
+    start = (page-1)*page_size
+    end =start + page_size
+
+    patients = query.slice(start, end).all()
+
+    return patients
+
+def add_examination_form(**kwargs):
+    name = kwargs.get('name')
+    date = kwargs.get('date')
+    symptom = kwargs.get('symptom')
+    disease = kwargs.get('disease')
+    medicineName = kwargs.get('medicineName')
+    quantity = kwargs.get('quantity')
+    unit = kwargs.get('unit')
+    id = kwargs.get('id')
+    instruction = kwargs.get('instruction')
+
+    patient = NguoiDung.query.filter_by(hoTen=name, loaiNguoiDung=Role.Patient).first()
+    
+    if patient:
+        benhNhan_id = patient.id
+
+    medicine = Thuoc.query.filter_by(tenThuoc=medicineName).first()
+    if medicine:
+        idThuoc = medicine.id
+
+    new_examination = PhieuKham(
+        ngayKham=date,
+        trieuChung=symptom,
+        duDoan=disease,
+        benhNhan_id=benhNhan_id,
+        bacSi_id = id
+    )
+    db.session.add(new_examination)
+    db.session.commit()
+
+    if unit:
+        donvi_thuoc = DonViThuoc.query.filter_by(id=unit).first()
+    
+    new_prescription = ToaThuoc(
+        thuoc_id=idThuoc,
+        phieuKham_id=new_examination.id,
+        soLuong=quantity,
+        lieuLuong= donvi_thuoc.donVi,
+        cachDung=instruction
+    )
+    db.session.add(new_prescription)
+    db.session.commit()

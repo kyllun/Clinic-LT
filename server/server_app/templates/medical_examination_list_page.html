@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container mx-auto px-10 py-8">
-    <h1 class="text-3xl font-bold mb-4">Danh sách khám bệnh</h1>
+    <h1 class="text-center text-3xl font-bold mb-4">Danh sách khám bệnh</h1>
 
     <div class="mb-4">
         <form action="/medical_list" method="get">
@@ -63,6 +63,38 @@
                 listBtn.classList.add('hidden');
             }
         }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var listBtn = document.getElementById('showListBtn');
+
+        listBtn.addEventListener('click', function() {
+            // Gửi yêu cầu tới máy chủ Flask để tạo tệp PDF
+            fetch('/generate_pdf', {
+                method: 'GET',
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                // Tạo một URL đặc biệt cho tệp PDF
+                const url = window.URL.createObjectURL(blob);
+
+                // Tạo một thẻ <a> ẩn và nhấp vào để tải xuống tệp PDF
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'medical_list.pdf';
+                document.body.appendChild(a);
+                a.click();
+
+                // Xóa URL sau khi đã sử dụng
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
     });
 </script>
 {% endblock %}

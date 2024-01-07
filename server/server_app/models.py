@@ -124,6 +124,9 @@ class Thuoc(BaseModel):
 
     phieuKham = relationship("ToaThuoc", backref="thuoc")
     donViThuoc_id = Column(Integer, ForeignKey('don_vi_thuoc.id'), nullable=False)
+
+    def __str__(self):
+        return self.tenThuoc
     
 
 class ToaThuoc(db.Model):
@@ -140,6 +143,9 @@ class DonViThuoc(BaseModel):
     donVi = Column(String(50))
 
     thuoc = relationship('Thuoc', backref='donViThuoc', lazy=True)
+
+    def __str__(self):
+        return self.donVi
     
 
 class QuyDinh(BaseModel):
@@ -152,7 +158,7 @@ class QuyDinh(BaseModel):
 if __name__ == '__main__':
     with app.app_context():
         # db.drop_all()
-        # db.create_all()
+        db.create_all()
 
         # password = '111'
         # password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())   
@@ -166,40 +172,40 @@ if __name__ == '__main__':
         # thuNgan1 = ThuNgan(nguoiDung=NguoiDung3, trinhDo='Thac si')
         # quanTriVien1 = QuanTriVien(nguoiDung=NguoiDung4, ghiChu='Quan tri vien cap cao')
 
-        new_thuoc = Thuoc(
-            tenThuoc='Thuoc A',
-            ngaySX=datetime.utcnow(),
-            hanSD=datetime.utcnow(),
-            donGia=10000.0,
-            donViThuoc_id=1
-        )
-        new_thuoc1 = Thuoc(
-            tenThuoc='Thuoc p',
-            ngaySX=datetime.utcnow(),
-            hanSD=datetime.utcnow(),
-            donGia=11000.0,
-            donViThuoc_id=2
-        )
-        new_thuoc2 = Thuoc(
-            tenThuoc='Thuoc o',
-            ngaySX=datetime.utcnow(),
-            hanSD=datetime.utcnow(),
-            donGia=12000.0,
-            donViThuoc_id=1
-        )
-        new_thuoc3 = Thuoc(
-            tenThuoc='Thuoc j',
-            ngaySX=datetime.utcnow(),
-            hanSD=datetime.utcnow(),
-            donGia=11000.0,
-            donViThuoc_id=3
-        )
-        new_thuoc4 = Thuoc(
-            tenThuoc='Thuoc b',
-            ngaySX=datetime.utcnow(),
-            hanSD=datetime.utcnow(),
-            donGia=11000.0,
-            donViThuoc_id=2
-        )
-        db.session.add_all([new_thuoc, new_thuoc1, new_thuoc2, new_thuoc3, new_thuoc4])
-        db.session.commit()
+        # new_thuoc = Thuoc(
+        #     tenThuoc='Thuoc A',
+        #     ngaySX=datetime.utcnow(),
+        #     hanSD=datetime.utcnow(),
+        #     donGia=10000.0,
+        #     donViThuoc_id=1
+        # )
+        # new_thuoc1 = Thuoc(
+        #     tenThuoc='Thuoc p',
+        #     ngaySX=datetime.utcnow(),
+        #     hanSD=datetime.utcnow(),
+        #     donGia=11000.0,
+        #     donViThuoc_id=2
+        # )
+        # new_thuoc2 = Thuoc(
+        #     tenThuoc='Thuoc o',
+        #     ngaySX=datetime.utcnow(),
+        #     hanSD=datetime.utcnow(),
+        #     donGia=12000.0,
+        #     donViThuoc_id=1
+        # )
+        # new_thuoc3 = Thuoc(
+        #     tenThuoc='Thuoc j',
+        #     ngaySX=datetime.utcnow(),
+        #     hanSD=datetime.utcnow(),
+        #     donGia=11000.0,
+        #     donViThuoc_id=3
+        # )
+        # new_thuoc4 = Thuoc(
+        #     tenThuoc='Thuoc b',
+        #     ngaySX=datetime.utcnow(),
+        #     hanSD=datetime.utcnow(),
+        #     donGia=11000.0,
+        #     donViThuoc_id=2
+        # )
+        # db.session.add_all([new_thuoc, new_thuoc1, new_thuoc2, new_thuoc3, new_thuoc4])
+        # db.session.commit()
