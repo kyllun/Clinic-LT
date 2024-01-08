@@ -3,36 +3,6 @@
 {% block body %}
 {% if current_user.is_authenticated %}
 <h1> Welcome {{current_user.name}} to administration website</h1>
-<div >
-<div >
-    <table class="table">
-      <tr>
-          <th>Ma Hoa Don</th>
-          <th>Tien kham</th>
-          <th>Tien Thuoc</th>
-          <th>Tong Tien</th>
-          <th>Ngay Kham</th>
-          <th>ThuNgan</th>
-          <th>PhieuKham</th>
-      </tr>
-      {% for hd in stats %}
-      <tr>
-          <th>{{ hd[0] }}</th>
-          <th>{{ hd[1] }}</th>
-          <th>{{ hd[2] }}</th>
-          <th>{{ hd[3] }}</th>
-          <th>{{ hd[4] }}</th>
-          <th>{{ hd[5] }}</th>
-          <th>{{ hd[6] }}</th>
-      </tr>
-
-    {% endfor %}
-    </table>
-</div>
-  <div>
-    <canvas id="mySaleReport"></canvas>
-  </div>
-</div>
 
 {% else %}
 
@@ -58,41 +28,6 @@
 <br>
 
 {%endif%}
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-let label =[]
-let data =[]
-{% for  s in sales_data %}
-    label.push('{{ s[0] }}')
-    data.push({{ s[1] }})
-{% endfor %}
-    window.onload=function (){
-        const  ctx=document.getElementById('mySaleReport').getContext('2d');
-            new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: label,
-              datasets: [{
-                label: 'Thong ke doanh thu',
-                data: data,
-                borderWidth: 1
-              }]
-            },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
-          });
-
-    }
-
-</script>
 
 {%endblock%}
 

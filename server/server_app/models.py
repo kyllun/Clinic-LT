@@ -34,6 +34,9 @@ class NguoiDung(BaseModel, UserMixin):
     thuNgan = relationship("ThuNgan", uselist=False, back_populates="nguoiDung")
     quanTriVien = relationship("QuanTriVien", uselist=False, back_populates="nguoiDung")
 
+    def __str__(self):
+        return self.hoTen
+
 
 class BenhNhan(db.Model):
     __tablename__ = 'benh_nhan'
@@ -80,6 +83,9 @@ class QuanTriVien(db.Model):
 
     nguoiDung = relationship("NguoiDung", back_populates="quanTriVien")
     quyDinh = relationship('QuyDinh', backref='quanTriVien', lazy=True)
+
+    def __str__(self):
+        return self.nguoiDung.hoTen
     
 
 class PhieuDangKy(BaseModel):
@@ -108,7 +114,7 @@ class HoaDon(BaseModel):
     tienKham = Column(Float, default=100000)
     tienThuoc = Column(Float, nullable=False)
     tongTien = Column(Float, nullable=False)
-    ngayLap = Column(DateTime, nullable=False)    
+    ngayLap = Column(DateTime, nullable=False) 
 
     thuNgan_id = Column(Integer, ForeignKey('thu_ngan.id'), nullable=False)
     phieuKham_id = Column(Integer, ForeignKey("phieu_kham.id"))

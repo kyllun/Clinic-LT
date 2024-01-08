@@ -1,5 +1,5 @@
 from flask import render_template, url_for, redirect, request, session, jsonify, send_file
-from server_app import app, dao, login, utils, admin, client, verify_sid
+from server_app import app, db, dao, login, utils, admin, client, verify_sid
 from flask_login import login_user, logout_user, login_required, current_user
 from server_app.models import Role
 from datetime import datetime
@@ -64,10 +64,6 @@ def user_signout():
 def user_load(user_id):
     return dao.get_user_by_id(user_id=user_id)
 
-# @app.context_processor
-# def common_response():
-#     return dict(Role=Role)
-
 @app.context_processor
 def common_responses():
     return {
@@ -116,7 +112,9 @@ def medical_register():
 
             date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')
             count = dao.count_register_medical(date = date)
-            if count > 0 and count < 5:
+            quyDinh = dao.lay_so_luong('Số lượng khám')
+            
+            if count > 0 and count < quyDinh:
                 dao.register_medical(patient_id=current_user.id, 
                                      date_time=date_time)
             else: 
@@ -133,8 +131,9 @@ def medical_register():
 
             date_time = datetime.strptime(f'{date} {time}', '%Y-%m-%d %H:%M')           
             count = dao.count_register_medical(date = date)
+            quyDinh = dao.lay_so_luong('Số lượng khám')
 
-            if count > 0 and count < 5:
+            if count > 0 and count < quyDinh:
                 dao.register_medical(phone=phone, 
                                      date_time=date_time)
             else: 
@@ -149,18 +148,6 @@ def medical_register():
 def medical_list():
     date = request.args.get('date')
     medical_list = dao.get_register_medical_by_date(date=date)
-
-    # verification = client.verify.v2.services(verify_sid) \
-    # .verifications \
-    # .create(to=verified_number, channel="sms")
-    # print(verification.status)
-
-    # otp_code = input("Please enter the OTP:")
-
-    # verification_check = client.verify.v2.services(verify_sid) \
-    # .verification_checks \
-    # .create(to=verified_number, code=otp_code)
-    # print(verification_check.status)
 
     return render_template('medical_examination_list_page.html', 
                            medical_list=medical_list)
@@ -217,15 +204,20 @@ def create_examination_form():
         unit = request.form.get('unit')
         instruction = request.form.get('instruction')
 
+        # try:
+        #     name = dao.check_name_patient(name=name)
+        # except:
+        #     msg ='khong tim thay benh nhan'
+        # else:
         dao.add_examination_form(name=name,
-                                 date=date,
-                                 symptom=symptom,
-                                 disease=disease,
-                                 medicineName=medicineName,
-                                 quantity=quantity,
-                                 unit=unit,
-                                 instruction=instruction,
-                                 id=current_user.id)
+                                date=date,
+                                symptom=symptom,
+                                disease=disease,
+                                medicineName=medicineName,
+                                quantity=quantity,
+                                unit=unit,
+                                instruction=instruction,
+                                id=current_user.id)
 
     return render_template('examination_form.html')
 
@@ -239,8 +231,6 @@ def patient_list():
                            patients=patients,
                            pages=math.ceil(counter / app.config['PAGE_SIZE']))
 
-#==================================================================================
-
 @app.route('/api/save_exam_data', methods=['POST'])
 def save_exam_data():
     data = request.json 
@@ -253,42 +243,25 @@ def get_exam_data():
     print(exam_data)
     return jsonify(exam_data)
 
-@app.route('receipt')
-def show_receipt():
-    
-    dao.show_receipt()
+@app.route('/receipt', methods=['GET', 'post'])
+def receipt():
+    list_examination = dao.get_list_examination()
 
-    return render_template('receipt.html')
-
+    return render_template('receipt.html', 
+                           list_examination=list_examination)
 
 @app.route('/api/pay', methods=['post'])
-@login_required
 def pay():
+    data = request.json
+    id = str(data.get('phieuKhamId'))
 
+    try:
+        dao.create_receipt(phieuKham_id=id,
+                       thuNgan_id=current_user.id)
+    except:
+        return jsonify({'code': 400})
+
+    return jsonify({'code': 200})
    
-
-# @app.route("/api/add-medicine",methods=['post'])
-# def add_to_medicine(): #add_prescription
-#     data= request.get_json()
-#     id=str(data.get('id'))
-#     tenThuoc=data.get('tenThuoc')
-#     donGia=data.get('donGia')
-#     medicine =session.get('medicine')
-#     if not medicine:
-#         medicine={}
-
-#     if id in medicine:
-#         medicine[id]['quantity']= medicine[id]['quantity']+1
-#     else:
-#         medicine[id]={
-#              'id':id,
-#             'tenThuoc':tenThuoc,
-#             'donGia':donGia,
-#             'quantity': 1
-#         }
-#     session['medicine']= medicine
-
-#     return jsonify(utils.counter_medicine(medicine))
-
 if __name__ == '__main__':
     app.run(debug=True)

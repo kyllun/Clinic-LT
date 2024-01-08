@@ -53,12 +53,18 @@ window.addEventListener('load', function() {
     });
 });
 
-function pay() {
+function pay(phieuKhamId) {
     if(confirm('Bạn chắc chắn có muốn thanh toán không?') == true) {
         fetch('/api/pay', {
             method: 'post',
+            body: JSON.stringify({
+                'phieuKhamId':phieuKhamId
+            }),
+            headers:{
+                'Content-Type':'application/json'
+            }
         }).then(res => res.json()).then(data => {
-            if(data.code == 200)
+            if(data.code === 200)
                 location.reload()
         }).catch(err => console.error(err))
     }

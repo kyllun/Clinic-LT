@@ -8,10 +8,16 @@
 
     <div class="mb-4">
         <form action="#" method="get">
+            <input type="text" name="kw" placeholder="Tìm kiếm hóa đơn theo tên" class="border border-gray-300 max-w-xl py-2 rounded-md w-full">
+            <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none" type="submit">Tìm kiếm</button>
+            
             <div class="relative overflow-x-auto shadow-lg border-gray-200 border rounded-lg">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
+                            <th scope="col" class="px-6 py-3">
+                                Tên thu ngân
+                            </th>
                             <th scope="col" class="px-6 py-3">
                                 Tên bệnh nhân
                             </th>
@@ -37,36 +43,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for l in list_examination %}
+                        
                         <tr class="bg-white border-b record">
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                {{l[0]}}
+                                
                             </th>
                             <td class="px-6 py-4">
-                                {{l[1]}}
+                               
                             </td>
                             <td class="px-6 py-4">
-                                {{l[2]}}
+                               
                             </td>
                             <td class="px-6 py-4">
-                                {{ "{:,.1f}".format(l[3]) }} VND
+                               
                             </td>
                             <td class="px-6 py-4">
-                                {{ "{:,.1f}".format(l[4]) }} VND
+                               
                             </td>
                             <td class="px-6 py-4">
-                                {{l[5]}}
+                               
                             </td>
                             <td class="px-6 py-4">
-                                {{ "{:,.1f}".format(l[6]) }} VND
+                               
                             </td>
                             <td class="px-6 py-4">
-                                <button type="button" onclick="pay('{{l[2]}}')" class="mt-4 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2 me-1 mb-1">
+                                <button type="button" class="mt-4 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-2 py-2 me-1 mb-1">
                                     Thanh toán
                                 </button>
                             </td>
                         </tr>
-                       {% endfor %}
+                       
                     </tbody>
                 </table>
             </div>

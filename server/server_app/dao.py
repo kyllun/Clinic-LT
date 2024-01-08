@@ -2,7 +2,7 @@ from server_app import app, db
 from server_app.models import *
 from sqlalchemy.orm.exc import NoResultFound
 import hashlib
-from sqlalchemy import func
+from sqlalchemy import extract, func, not_
 from io import BytesIO
 from reportlab.pdfgen import canvas
 
@@ -181,3 +181,142 @@ def add_examination_form(**kwargs):
     )
     db.session.add(new_prescription)
     db.session.commit()
+
+def get_list_examination():
+    try:
+        medical_fees = lay_gia_tien('Tiền khám')
+        subquery = db.session.query(HoaDon.phieuKham_id).subquery()
+        results = db.session.query(
+            NguoiDung.hoTen,
+            PhieuKham.ngayKham,
+            PhieuKham.id,
+            medical_fees,
+            Thuoc.donGia,
+            ToaThuoc.soLuong,
+            func.sum(Thuoc.donGia * ToaThuoc.soLuong + medical_fees)
+        )\
+        .join(NguoiDung, NguoiDung.id.__eq__(PhieuKham.benhNhan_id))\
+        .join(ToaThuoc, ToaThuoc.phieuKham_id.__eq__(PhieuKham.id))\
+        .join(Thuoc, Thuoc.id.__eq__(ToaThuoc.thuoc_id))\
+        .filter(not_(PhieuKham.id.in_(subquery)))\
+        .group_by(
+            NguoiDung.hoTen,
+            PhieuKham.ngayKham,
+            PhieuKham.id,
+            Thuoc.donGia,
+            ToaThuoc.soLuong,
+        ).all()
+    except Exception as ex:
+        print(ex)
+    
+    return results
+
+def create_receipt(**kwargs):
+    phieuKham_id = kwargs.get('phieuKham_id')
+    thuNgan_id = kwargs.get('thuNgan_id')
+
+    phieuKham_id = int(phieuKham_id)
+
+    if thuNgan_id:
+        thuNgan = NguoiDung.query.filter_by(id=thuNgan_id, loaiNguoiDung=Role.Cashier).first()
+    
+    if phieuKham_id:
+        phieuKham = PhieuKham.query.filter_by(id=phieuKham_id).first()
+
+    medical_fees = lay_gia_tien('Tiền khám')
+    
+    medicine_money = db.session.query(Thuoc.donGia)\
+            .join(ToaThuoc, Thuoc.id == ToaThuoc.thuoc_id)\
+            .join(PhieuKham, PhieuKham.id == ToaThuoc.phieuKham_id)\
+            .filter(PhieuKham.id == phieuKham_id)\
+            .first()
+    
+    quantity = ToaThuoc.query.filter_by(phieuKham_id=phieuKham_id).first().soLuong
+
+    date = PhieuKham.query.filter_by(id=phieuKham_id).first().ngayKham
+
+    total_money = medical_fees + (medicine_money[0] * quantity)
+
+    new_receipt = HoaDon(tienKham=medical_fees,
+                         tienThuoc=medicine_money[0],
+                         tongTien=total_money,
+                         ngayLap=date,
+                         thuNgan_id=thuNgan.id,
+                         phieuKham_id=phieuKham_id)
+    
+    db.session.add(new_receipt)
+    db.session.commit()    
+
+def lay_so_luong(name):
+    medicine_amount = QuyDinh.query.filter_by(tenQuyDinh=name).first()
+
+    if medicine_amount:
+        amount = medicine_amount.moTa
+
+        # Chuyển đổi mô tả thành số nguyên (nếu có thể)
+        try:
+            amount = int(amount)
+            return amount
+        except (TypeError, ValueError):
+            return None  # Trả về None nếu không thể chuyển đổi thành số nguyên
+    else:
+        return None  # Trả về None nếu không tìm thấy dữ liệu phù hợp
+    
+def lay_gia_tien(name):
+    medicine_amount = QuyDinh.query.filter_by(tenQuyDinh=name).first()
+
+    if medicine_amount:
+        amount = medicine_amount.moTa
+
+        # Chuyển đổi mô tả thành số nguyên (nếu có thể)
+        try:
+            amount = float(amount)
+            return amount
+        except (TypeError, ValueError):
+            return None  # Trả về None nếu không thể chuyển đổi thành số nguyên
+    else:
+        return None  # Trả về None nếu không tìm thấy dữ liệu phù hợp
+    
+def money_stats(month):
+    with app.app_context():
+        query = db.session.query(
+            extract('month', HoaDon.ngayLap).label('Tháng'),
+            func.sum(HoaDon.tongTien).label('Doanh thu')
+        ).group_by(extract('month', HoaDon.ngayLap))
+
+        results = query.all()
+
+        return results
+    
+def tan_suat_kham(month):
+    with app.app_context():
+        query = db.session.query(
+            extract('month', PhieuKham.ngayKham).label('Tháng'),
+            (func.count(PhieuKham.id) / 30 * 100).label('Tần suất khám')
+        ).group_by(extract('month', PhieuKham.ngayKham))
+
+        if month:
+            query = query.filter(extract('month', PhieuKham.ngayKham) == month)
+
+        results = query.all()
+
+        return results
+    
+def tan_suat_su_dung_thuoc(month):
+    with app.app_context():
+        # Tạo truy vấn cơ bản
+        query = db.session.query(
+            Thuoc.tenThuoc,
+            extract('month', PhieuKham.ngayKham).label('Tháng'),
+            (func.sum(ToaThuoc.soLuong) / 30 * 100).label('Tần suất sử dụng')
+        )\
+        .join(ToaThuoc, ToaThuoc.thuoc_id.__eq__(Thuoc.id))\
+        .join(PhieuKham, PhieuKham.id.__eq__(ToaThuoc.phieuKham_id))\
+        .group_by(Thuoc.tenThuoc, extract('month', PhieuKham.ngayKham))
+
+        if month:
+            query = query.filter(extract('month', PhieuKham.ngayKham) == month)
+
+        results = query.all()
+
+        return results
